@@ -1,0 +1,49 @@
+{
+    "_comment": "DO NOT EDIT: FILE GENERATED AUTOMATICALLY BY PTERODACTYL PANEL - PTERODACTYL.IO",
+    "meta": {
+        "version": "PTDL_v2",
+        "update_url": null
+    },
+    "exported_at": "2022-10-29T20:51:32+02:00",
+    "name": "Crucible",
+    "author": "alex.chang-lam@protonmail.com",
+    "description": "Crucible is a Thermos fork containing various patches for bug fixes and performance improvements. Join our discord to stay updated with the project development.",
+    "features": [
+        "eula",
+        "java_version",
+        "pid_limit"
+    ],
+    "docker_images": {
+        "ghcr.io\/pterodactyl\/yolks:java_8": "ghcr.io\/pterodactyl\/yolks:java_8",
+        "ghcr.io\/pterodactyl\/yolks:java_11": "ghcr.io\/pterodactyl\/yolks:java_11",
+        "ghcr.io\/pterodactyl\/yolks:java_16": "ghcr.io\/pterodactyl\/yolks:java_16",
+        "ghcr.io\/pterodactyl\/yolks:java_17": "ghcr.io\/pterodactyl\/yolks:java_17"
+    },
+    "file_denylist": [],
+    "startup": "java -Xmx{{SERVER_MEMORY}}M -Xms{{SERVER_MEMORY}}M -jar {{SERVER_JARFILE}} pause",
+    "config": {
+        "files": "{\r\n    \"server.properties\": {\r\n        \"parser\": \"properties\",\r\n        \"find\": {\r\n            \"server-ip\": \"0.0.0.0\",\r\n            \"server-port\": \"{{server.build.default.port}}\"\r\n        }\r\n    }\r\n}",
+        "startup": "{\r\n    \"done\": \")! For help, type \",\r\n    \"userInteraction\": [\r\n        \"Go to eula.txt for more info.\"\r\n    ]\r\n}",
+        "logs": "{}",
+        "stop": "stop"
+    },
+    "scripts": {
+        "installation": {
+            "script": "#!\/bin\/bash\r\napt update\r\napt install -y curl wget jq file unzip\r\n\r\nGITHUB_PACKAGE=CrucibleMC\/Crucible\r\n\r\nif [ -z \"$GITHUB_USER\" ] && [ -z \"$GITHUB_OAUTH_TOKEN\" ] ; then\r\n    echo -e \"using anon api call\"\r\nelse\r\n    echo -e \"user and oauth token set\"\r\n    alias curl='curl -u $GITHUB_USER:$GITHUB_OAUTH_TOKEN '\r\nfi\r\n\r\n## get release info and download links\r\nLATEST_JSON=$(curl --silent \"https:\/\/api.github.com\/repos\/$GITHUB_PACKAGE\/releases\/latest\")\r\n\r\nDOWNLOAD_LINK=$(echo $LATEST_JSON | jq .assets | jq -r .[].browser_download_url)\r\n\r\n## mkdir and cd to \/mnt\/server\/\r\nmkdir -p \/mnt\/server\r\n\r\ncd \/mnt\/server\r\n\r\n## download release\r\necho -e \"Luti daunloading: wget -O server.jar $DOWNLOAD_LINK\"\r\nwget -O server.jar $DOWNLOAD_LINK\r\n\r\necho \"Gotovo brooooooooooooooooooooooooo\"",
+            "container": "debian:buster-slim",
+            "entrypoint": "bash"
+        }
+    },
+    "variables": [
+        {
+            "name": "Server Jar File",
+            "description": "The name of the jarfile to run the server with.",
+            "env_variable": "SERVER_JARFILE",
+            "default_value": "server.jar",
+            "user_viewable": true,
+            "user_editable": false,
+            "rules": "required|string|max:20",
+            "field_type": "text"
+        }
+    ]
+}
